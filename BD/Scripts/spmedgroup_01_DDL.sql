@@ -1,94 +1,107 @@
---DDL
-
---Criando o banco de dados
 CREATE DATABASE SP_Medical_Group;
 GO
 
---Definindo o banco de dados que será utilizado
 USE SP_Medical_Group;
 GO
 
--- Cria a tabela tipoUsuario
-CREATE TABLE tipoUsuario
+CREATE TABLE TiposUsuarios
 (
-	idTipoUsuario	INT PRIMARY KEY IDENTITY
-	,tipo			VARCHAR(150) UNIQUE NOT NULL
+	IdTipoUsuario		INT PRIMARY KEY IDENTITY,
+	Titulo				VARCHAR(100) NOT NULL
 );
 GO
 
--- Cria a tabela usuario
-CREATE TABLE usuario
+CREATE TABLE Usuarios
 (
-	idUsuario		INT PRIMARY KEY IDENTITY
-	,idTipoUsuario	INT FOREIGN KEY REFERENCES tipoUsuario(idTipoUsuario)
-	,rg				VARCHAR(10) UNIQUE NOT NULL
-	,cpf			VARCHAR(11) UNIQUE NOT NULL
-	,endereco		VARCHAR(255) NOT NULL
-	,dataNascimento	DATE NOT NULL
-	,telefone		VARCHAR(11) NOT NULL
-	,email			VARCHAR(150) UNIQUE NOT NULL
-	,senha			VARCHAR(150) NOT NULL
+	IdUsuario			INT PRIMARY KEY IDENTITY,
+	IdTipoUsuario		INT FOREIGN KEY REFERENCES TiposUsuarios (IdTipoUsuario) NOT NULL,
+	Email				VARCHAR(150) NOT NULL,
+	Senha				VARCHAR(150) NOT NULL
 );
 GO
 
--- Cria a tabela administrador
-CREATE TABLE administrador
+CREATE TABLE Pacientes
 (
-	idAdministrador	INT PRIMARY KEY IDENTITY
-	,idUsuario		INT FOREIGN KEY REFERENCES usuario(idUsuario)
-	,nome			VARCHAR(150) NOT NULL
+	IdPaciente			INT PRIMARY KEY IDENTITY,
+	IdUsuario			INT FOREIGN KEY REFERENCES Usuarios (IdUsuario) NOT NULL,
+	Nome				VARCHAR(250) NOT NULL,
+	DataNascimento		DATE NOT NULL,
+	Telefone			VARCHAR(15) NOT NULL,
+	RG					CHAR(9) NOT NULL,
+	CPF					CHAR(11) NOT NULL,
+	CEP					CHAR(8) NOT NULL,
+	Endereco			VARCHAR(300) NOT NULL
 );
 GO
 
--- Cria a tabela clinica
-CREATE TABLE clinica
+CREATE TABLE Clinicas
 (
-	idClinica				INT PRIMARY KEY IDENTITY
-	,endereco				VARCHAR(255) NOT NULL
-	,horarioFuncionamento	VARCHAR(150) NOT NULL
-	,cnpj					CHAR(14) UNIQUE NOT NULL
-	,nomeFantasia			VARCHAR(150) NOT NULL
-	,razaoSocial			VARCHAR(150) NOT NULL
+	IdClinica			INT PRIMARY KEY IDENTITY,
+	Nome				VARCHAR(200) NOT NULL,
+	CNPJ				CHAR(14) NOT NULL,
+	RazaoSocial			VARCHAR(200) NOT NULL,
+	HorarioAbertura		TIME NOT NULL,
+	HorarioFechamento	TIME NOT NULL,
+	Endereco			VARCHAR(300) NOT NULL
 );
 GO
 
--- Cria a tabela especialidade
-CREATE TABLE especialidade
+CREATE TABLE Especialidades
 (
-	idEspecialidade	INT PRIMARY KEY IDENTITY
-	,tipo			VARCHAR(200) NOT NULL
+	IdEspecialidade		INT PRIMARY KEY IDENTITY,
+	Titulo				VARCHAR(300) NOT NULL
 );
 GO
 
--- Cria a tabela medico
-CREATE TABLE medico
+CREATE TABLE Medicos
 (
-	idMedico			INT PRIMARY KEY IDENTITY
-	,idClinica			INT FOREIGN KEY REFERENCES clinica(idClinica)
-	,idEspecialidade	INT FOREIGN KEY REFERENCES especialidade(idEspecialidade)
-	,idUsuario			INT FOREIGN KEY REFERENCES usuario(idUsuario)
-	,nome				VARCHAR(150) NOT NULL
-	,crm				VARCHAR(7) UNIQUE NOT NULL
+	IdMedico			INT PRIMARY KEY IDENTITY,
+	IdUsuario			INT FOREIGN KEY REFERENCES Usuarios (IdUsuario) NOT NULL,
+	IdClinica			INT FOREIGN KEY REFERENCES Clinicas (IdClinica) NOT NULL,
+	IdEspecialidade		INT FOREIGN KEY REFERENCES Especialidades (IdEspecialidade) NOT NULL,
+	Nome				VARCHAR(250) NOT NULL,
+	CRM					CHAR(5) NOT NULL,
+	Estado				CHAR(2) NOT NULL
 );
 GO
 
--- Cria a tabela paciente
-CREATE TABLE paciente
+CREATE TABLE Situacoes
 (
-	idPaciente	INT PRIMARY KEY IDENTITY
-	,idUsuario	INT FOREIGN KEY REFERENCES usuario(idUsuario)
-	,nome		VARCHAR(150) NOT NULL
-	,descricao	VARCHAR(255) NOT NULL
+	IdSituacao			INT PRIMARY KEY IDENTITY,
+	Titulo				VARCHAR(150) NOT NULL
 );
 GO
 
--- Cria a tabela consulta
-CREATE TABLE consulta
+CREATE TABLE Consultas
 (
-	idConsulta			INT PRIMARY KEY IDENTITY
-	,idPaciente			INT FOREIGN KEY REFERENCES paciente(idPaciente)
-	,idMedico			INT FOREIGN KEY REFERENCES medico(idMedico)
-	,dataAgendamento	DATETIME NOT NULL
-	,situacao			VARCHAR(150) NOT NULL
+	IdConsulta			INT PRIMARY KEY IDENTITY,
+	IdPaciente			INT FOREIGN KEY REFERENCES Pacientes (IdPaciente) NOT NULL,
+	IdMedico			INT FOREIGN KEY REFERENCES Medicos (IdMedico) NOT NULL,
+	IdSituacao			INT FOREIGN KEY REFERENCES Situacoes (IdSituacao) DEFAULT(1),
+	DataAgendamento		DATETIME NOT NULL,
+	Descricao			VARCHAR(350)
 );
 GO
+
+CREATE FUNCTION QuantidadeDeMedicos(@Especialidade VARCHAR(300))
+RETURNS INT
+AS
+BEGIN
+	DECLARE @Number		INT
+
+	SELECT 
+		@Number = COUNT(IdMedico) 
+	FROM Medicos M
+	INNER JOIN Especialidades E
+	ON M.IdEspecialidade = E.IdEspecialidade
+	WHERE E.Titulo = @Especialidade
+
+	RETURN @Number
+END;
+
+CREATE PROCEDURE BuscaIdade (@Email	VARCHAR(150))
+AS
+SELECT P.Nome, DATEDIFF(year, DataNascimento, GETDATE()) AS [Idade] FROM Pacientes P
+INNER JOIN Usuarios U
+ON P.IdUsuario = U.IdUsuario
+WHERE U.Email = @Email;
