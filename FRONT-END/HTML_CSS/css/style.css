@@ -1,0 +1,68 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.topo{
+    width: 100%;
+    height: 56px;
+    background-color: #2D80AD;
+}
+
+.menu{
+    max-width: 1200px;
+    height: 56px;
+    margin: auto;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.banner{
+    width: 100%;
+    height: 559px;
+    display: flex;
+    background-image:url(/images/login\ 1.png);
+}
+
+.banner_alinhamento{
+    width: 1200px;
+    height: 100%;
+    display: flex;
+    margin: auto;
+    justify-content: space-around;
+}
+
+.banner_text{
+    margin-top: 79.5px;
+}
+
+.campo_login{
+    background-color: #2D80AD;
+    width: 400px;
+    height: 400px;
+    margin-top: 79.5px;
+    border-radius: 30px;
+}
+
+.login{
+    width: 270px;
+    height: 400px;
+    margin-left: 65px;
+}
+
+.login input{
+    width: 270px;
+    height: 50px;
+    margin-top: 50px;
+    border: none;
+}
+
+.login button{
+    width: 270px;
+    height: 60px;
+    margin-top: 70px;
+    background-color: #41B9FA;
+    border: none;
+}

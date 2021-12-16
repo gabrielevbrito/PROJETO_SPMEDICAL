@@ -1,0 +1,33 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.topo{
+    width: 100%;
+    height: 56px;
+    background-color: #2D80AD;
+}
+
+.menu{
+    max-width: 1200px;
+    height: 56px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu a{
+    color: black;
+}
+
+.banner{
+    background-image: url(/images/Paciente\ 1.png);
+}
+
+.tabela{
+    margin-left: 83px;
+    margin-top: 10px;
+}
